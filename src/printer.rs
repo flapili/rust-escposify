@@ -221,6 +221,18 @@ impl<W: io::Write> Printer<W> {
         Ok(n)
     }
 
+    pub fn chain_invert(&mut self, invert: bool) -> io::Result<&mut Self> {
+        self.invert(invert).map(|_| self)
+    }
+
+
+    pub fn invert(&mut self, invert: bool) -> io::Result<usize> {
+        match invert {
+            true => self.write(consts::TXT_INVERT_ON),
+            false => self.write(consts::TXT_INVERT_OFF),
+        }
+    }
+
     pub fn chain_hardware(&mut self, hw: &str) -> io::Result<&mut Self> {
         self.hardware(hw).map(|_| self)
     }
