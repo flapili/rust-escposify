@@ -225,11 +225,21 @@ impl<W: io::Write> Printer<W> {
         self.invert(invert).map(|_| self)
     }
 
-
     pub fn invert(&mut self, invert: bool) -> io::Result<usize> {
         match invert {
             true => self.write(consts::TXT_INVERT_ON),
             false => self.write(consts::TXT_INVERT_OFF),
+        }
+    }
+
+    pub fn chain_flip(&mut self, flip: bool) -> io::Result<&mut Self> {
+        self.flip(flip).map(|_| self)
+    }
+
+    pub fn flip(&mut self, flip: bool) -> io::Result<usize> {
+        match flip {
+            true => self.write(consts::TXT_FLIP_ON),
+            false => self.write(consts::TXT_FLIP_OFF),
         }
     }
 

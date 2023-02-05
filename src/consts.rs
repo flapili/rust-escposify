@@ -73,10 +73,11 @@ pub const TXT_ALIGN_LT: &[u8] = b"\x1b\x61\x00"; // Left justification
 pub const TXT_ALIGN_CT: &[u8] = b"\x1b\x61\x01"; // Centering
 pub const TXT_ALIGN_RT: &[u8] = b"\x1b\x61\x02"; // Right justification
 
-
 pub const TXT_INVERT_OFF: &[u8] = b"\x1d\x42\x00"; // Text invert OFF
 pub const TXT_INVERT_ON: &[u8] = b"\x1d\x42\x01"; // Text invert ON
 
+pub const TXT_FLIP_OFF: &[u8] = b"\x1b\x7b\x00"; // Text flip OFF
+pub const TXT_FLIP_ON: &[u8] = b"\x1b\x7b\x01"; // Text flip ON
 
 /**
  * [`BARCODE_FORMAT` Barcode format]
