@@ -323,14 +323,21 @@ impl<W: io::Write> Printer<W> {
     }
 
     #[cfg(feature = "qrcode")]
-    pub fn chain_qrimage(&mut self, content: &str, size: u32) -> io::Result<&mut Self> {
-        self.qrimage(content, size).map(|_| self)
+    pub fn chain_qrimage(&mut self, content: &str, size: u32, width: u32, center: bool) -> io::Result<&mut Self> {
+        self.qrimage(content, size, width, center).map(|_| self)
     }
     #[cfg(feature = "qrcode")]
-    pub fn qrimage(&mut self, content: &str, size: u32) -> io::Result<usize> {
+    pub fn qrimage(
+        &mut self,
+        content: &str,
+        size: u32,
+        width: u32,
+        center: bool,
+    ) -> io::Result<usize> {
         use qr_code::QrCode;
 
         let code = QrCode::new(content).unwrap();
+
         let buf: Vec<u8> = code
             .to_vec()
             .iter()
@@ -349,7 +356,31 @@ impl<W: io::Write> Printer<W> {
             image::imageops::FilterType::Nearest,
         );
 
-        let n = self.bit_image(&Image::from(img), Some("d24")).unwrap();
+        let max_width = match center {
+            true => width,
+            false => img.width(),
+        };
+        let max_height = img.height();
+        let width = img.width();
+        let height = img.height();
+
+        let mut cover = image::ImageBuffer::from_fn(max_width + 32, max_height + 32, |_x, _y| {
+            image::Rgb([255, 255, 255])
+        });
+
+        image::imageops::overlay(
+            &mut cover,
+            &img.to_rgb8(),
+            ((max_width - width) / 2 + 16) as i64,
+            ((max_height - height) / 2 + 16) as i64,
+        );
+
+        let n = self
+            .bit_image(
+                &Image::from(image::DynamicImage::ImageRgb8(cover)),
+                Some("d24"),
+            )
+            .unwrap();
         Ok(n)
     }
 
