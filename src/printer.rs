@@ -323,12 +323,34 @@ impl<W: io::Write> Printer<W> {
     }
 
     #[cfg(feature = "qrcode")]
-    pub fn chain_qrimage(&mut self) -> io::Result<&mut Self> {
-        self.qrimage().map(|_| self)
+    pub fn chain_qrimage(&mut self, content: &str, size: u32) -> io::Result<&mut Self> {
+        self.qrimage(content, size).map(|_| self)
     }
     #[cfg(feature = "qrcode")]
-    pub fn qrimage(&mut self) -> io::Result<usize> {
-        Ok(0)
+    pub fn qrimage(&mut self, content: &str, size: u32) -> io::Result<usize> {
+        use qr_code::QrCode;
+
+        let code = QrCode::new(content).unwrap();
+        let buf: Vec<u8> = code
+            .to_vec()
+            .iter()
+            .map(|&x| match x {
+                true => vec![0, 0, 0],
+                false => vec![255, 255, 255],
+            })
+            .collect::<Vec<Vec<u8>>>()
+            .concat();
+
+        let img_size = ((buf.len() / 3) as f64).sqrt() as u32;
+        let temp = image::ImageBuffer::from_vec(img_size, img_size, buf).unwrap();
+        let img = image::DynamicImage::ImageRgb8(temp).resize(
+            size,
+            size,
+            image::imageops::FilterType::Nearest,
+        );
+
+        let n = self.bit_image(&Image::from(img), Some("d24")).unwrap();
+        Ok(n)
     }
 
     #[cfg(feature = "qrcode")]
