@@ -24,7 +24,7 @@ image = "0.24"
 
 qrcode =  { version = "0.12", optional = true }
 qr_code = { git = "https://github.com/RCasatta/qr_code", version = "1.1.0" }
-# qr_code = { version = "1.1.0", path = "../qr_code" }
+rusb = "0.9.1"
 
 [dev-dependencies]
 tempfile = "2.2"

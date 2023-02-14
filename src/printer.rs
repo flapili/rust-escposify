@@ -323,7 +323,13 @@ impl<W: io::Write> Printer<W> {
     }
 
     #[cfg(feature = "qrcode")]
-    pub fn chain_qrimage(&mut self, content: &str, size: u32, width: u32, center: bool) -> io::Result<&mut Self> {
+    pub fn chain_qrimage(
+        &mut self,
+        content: &str,
+        size: u32,
+        width: u32,
+        center: bool,
+    ) -> io::Result<&mut Self> {
         self.qrimage(content, size, width, center).map(|_| self)
     }
     #[cfg(feature = "qrcode")]
@@ -375,12 +381,10 @@ impl<W: io::Write> Printer<W> {
             ((max_height - height) / 2 + 16) as i64,
         );
 
-        let n = self
-            .bit_image(
-                &Image::from(image::DynamicImage::ImageRgb8(cover)),
-                Some("d24"),
-            )
-            .unwrap();
+        let n = self.bit_image(
+            &Image::from(image::DynamicImage::ImageRgb8(cover)),
+            Some("d24"),
+        )?;
         Ok(n)
     }
 
@@ -479,6 +483,7 @@ impl<W: io::Write> Printer<W> {
             n_bytes += self.write(line.as_ref())?;
             n_bytes += self.feed(1)?;
         }
+        n_bytes += self.line_space(-1)?;
         Ok(n_bytes)
     }
 
